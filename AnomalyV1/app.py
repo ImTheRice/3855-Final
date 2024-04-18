@@ -22,6 +22,19 @@ from pykafka.common import OffsetType
 import datetime
 import json
 from flask import request
+from pykafka import KafkaClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from anomoly import Anomaly
+import json
+from base import Base
+import yaml
+import logging
+import os
+import connexion
+from connexion.middleware import MiddlewarePosition
+from starlette.middleware.cors import CORSMiddleware
+from pykafka.common import OffsetType
 
 
 environment = os.getenv("TARGET_ENV", "development")
@@ -145,7 +158,7 @@ def get_anomalies():
 
     # Convert anomalies to dictionary representation
     anomalies_dict = [anomaly.to_dict() for anomaly in anomalies]
-
+    logger.info(f"Returning anomalies: {anomalies_dict}")
     return json.dumps(anomalies_dict)
 
 if __name__ == '__main__':
