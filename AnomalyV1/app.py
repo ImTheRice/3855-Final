@@ -144,4 +144,4 @@ app.add_middleware(
 app.add_api('Transit.yaml', base_path="/anomaly", strict_validation=True, validate_responses=True)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0', port=8200)
