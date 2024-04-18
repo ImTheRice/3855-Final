@@ -1,0 +1,10 @@
+# Assuming this part goes into your config.yaml
+kafka:
+  hosts: "acit3855group4kafka.eastus2.cloudapp.azure.com:9092"
+  topic: "event_log"
+  max_retries: 5
+  retry_interval: 10  # This may need to be adjusted to 'retry_interval': 3000 (milliseconds)
+
+database:
+  path: "database/events.json"
+

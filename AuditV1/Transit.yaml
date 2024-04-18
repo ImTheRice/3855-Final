@@ -1,0 +1,100 @@
+openapi: 3.0.0
+info:
+  title: Audit API
+  description: API for auditing Vehicle Status and Incident Events from Kafka
+  version: "1.0.0"
+  contact:
+    email: rmaharjan1@my.bcit.ca
+servers:
+  - url: /
+paths:
+  /audit/vehicle-status/{index}:
+    get:
+      tags:
+        - Audit
+      summary: Get a Vehicle Status event by index
+      operationId: app.get_vehicle_status_event
+      parameters:
+        - in: path
+          name: index
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successfully retrieved Vehicle Status event
+        '404':
+          description: Vehicle Status event not found at the specified index
+
+  /audit/incident-report/{index}:
+    get:
+      tags:
+        - Audit
+      summary: Get an Incident Report event by index
+      operationId: app.get_incident_event
+      parameters:
+        - in: path
+          name: index
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successfully retrieved Incident Report event
+        '404':
+          description: Incident Report event not found at the specified index
+
+
+components:
+  schemas:
+    VehicleStatusEvent:
+      type: object
+      required:
+        - uuid
+        - distanceTravelled
+        - timeToArrival
+        - onTimeScore
+        - userId
+        - trace_id
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        distanceTravelled:
+          type: number
+        timeToArrival:
+          type: string
+        onTimeScore:
+          type: integer
+        userId:
+          type: string
+          format: uuid
+        trace_id:
+          type: string
+          format: uuid
+
+    IncidentEvent:
+      type: object
+      required:
+        - uuid
+        - incidentType
+        - incidentSeverity
+        - expectedDuration
+        - userId
+        - trace_id
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        incidentType:
+          type: string
+        incidentSeverity:
+          type: integer
+        expectedDuration:
+          type: string
+        userId:
+          type: string
+          format: uuid
+        trace_id:
+          type: string
+          format: uuid

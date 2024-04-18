@@ -1,0 +1,4 @@
+events:
+  hostname: 'acit3855group4kafka.eastus2.cloudapp.azure.com'
+  port: 9092
+  topic: 'events'

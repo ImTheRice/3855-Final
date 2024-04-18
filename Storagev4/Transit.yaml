@@ -1,0 +1,177 @@
+---
+openapi: 3.0.0
+info:
+  title: Transit Report API
+  description: This is a simple Transit API
+  contact:
+    email: rmaharjan1+TransitAPI@my.bcit.ca
+  version: 1.0.0
+servers:
+- url: /
+tags:
+- name: TransitEvents
+  description: Endpoints for reporting transit-related events
+paths:
+  /events/vehicle-status:
+    post:
+      tags:
+      - TransitEvents
+      summary: Report vehicle status event
+      operationId: app.reportVehicleStatusEvent
+      requestBody:
+        description: Vehicle status event data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleStatusEvent'
+        required: true
+      responses:
+        "201":
+          description: Event received successfully
+        "400":
+          description: "Invalid input, object invalid"
+    get:
+      tags:
+        - Vehicle Status
+      summary: Gets vehicle status events based on timestamp range
+      operationId: app.GetreportVehicleStatusEvent
+      description: Fetches vehicle status events added within the specified timestamp range
+      parameters:
+        - name: start_timestamp
+          in: query
+          description: Start of the timestamp range
+          schema:
+            type: string
+            format: date-time
+          example: '2024-01-01T00:00:00Z'
+        - name: end_timestamp
+          in: query
+          description: End of the timestamp range
+          schema:
+            type: string
+            format: date-time
+          example: '2024-01-31T23:59:59Z'
+      responses:
+        '200':
+          description: Successfully returned a list of vehicle status events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VehicleStatusEvent'
+        '405':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /events/incident-report:
+    post:
+      tags:
+      - TransitEvents
+      summary: Report incident event
+      operationId: app.reportIncidentEvent
+      requestBody:
+        description: Incident event data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncidentEvent'
+        required: true
+      responses:
+        "201":
+          description: Event received successfully
+        "400":
+          description: "Invalid input, object invalid"
+    get:
+      tags:
+        - Incident Report
+      summary: Gets incident reports based on timestamp range
+      operationId: app.GetreportIncidentEvent
+      description: Fetches incident reports added within the specified timestamp range
+      parameters:
+        - name: start_timestamp
+          in: query
+          description: Start of the timestamp range
+          schema:
+            type: string
+            format: date-time
+          example: '2024-02-01T00:00:00Z'
+        - name: end_timestamp
+          in: query
+          description: End of the timestamp range
+          schema:
+            type: string
+            format: date-time
+          example: '2024-02-28T23:59:59Z'
+      responses:
+        '200':
+          description: Successfully returned a list of incident reports
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IncidentEvent'
+        '405':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+components:
+  schemas:
+    VehicleStatusEvent:
+      required:
+        - uuid
+        - distanceTravelled
+        - timeToArrival
+        - onTimeScore
+        - userId
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        distanceTravelled:
+          type: number
+        timeToArrival:
+          type: string
+        onTimeScore:
+          type: integer
+        userId:
+          type: string
+          format: uuid
+        trace_id:
+          type: string
+          format: uuid
+
+    IncidentEvent:
+      required:
+        - uuid
+        - incidentType
+        - incidentSeverity
+        - expectedDuration
+        - userId
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        incidentType:
+          type: string
+        incidentSeverity:
+          type: integer
+        expectedDuration:
+          type: string
+        userId:
+          type: string
+          format: uuid
+        trace_id:
+          type: string
+          format: uuid

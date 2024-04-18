@@ -1,0 +1,16 @@
+# [V5] CONTAINER ADJUSTMENTS
+version: 1
+datastore:
+  hostname: acit3855group4kafka.eastus2.cloudapp.azure.com
+  port: 3306
+  user: superbaddefault
+  password: superbaddefault
+  db: events
+events:
+  hostname: acit3855group4kafka.eastus2.cloudapp.azure.com
+  port: 9092
+  topic: events
+kafka:
+  max_retries: 5
+  retry_interval: 10
+  event_log_topic: event_log

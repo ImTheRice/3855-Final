@@ -1,0 +1,54 @@
+.App {
+  text-align: center;
+  color: #333; /* Dark gray text color for contrast */
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+  animation: App-logo-spin infinite 20s linear;
+}
+
+.App-header {
+  background-color: #fff; /* White background for the header */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.2); /* Subtle shadow for depth */
+}
+
+.App-link {
+  color: #4CAF50; /* Modern green for links */
+}
+
+.error {
+  color: #D32F2F; /* Updated error color for better visibility */
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.StatsTable{
+  margin: 20px auto;
+  width: 90%; /* Responsive width */
+  background-color: #fff; /* White background for the table */
+  border-collapse: collapse;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Light shadow for depth */
+}
+
+.StatsTable th, .StatsTable td {
+  padding: 12px 15px;
+  border: 1px solid #ddd; /* Light gray border */
+}
+
+.StatsTable th {
+  background-color: #4CAF50; /* Green header background */
+  color: #fff; /* White text for headers */
+}
+
+.StatsTable tr:nth-child(even) {
+  background-color: #f2f2f2; /* Zebra striping for rows */
+}
+

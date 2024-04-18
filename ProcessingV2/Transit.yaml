@@ -1,0 +1,69 @@
+openapi: 3.0.0
+info:
+  title: Transit Report API
+  description: This is a simple Transit API
+  contact:
+    email: rmaharjan1+TransitAPI@my.bcit.ca
+  version: 1.0.0
+servers:
+- url: /
+tags:
+- name: Statistics
+  description: Endpoints for retrieving transit event statistics
+paths:
+  /events/stats:
+    get:
+      tags:
+        - Statistics
+      summary: Gets the event stats
+      operationId: app.get_stats
+      description: Retrieves processed statistics for Transit Events
+      responses:
+        '200':
+          description: Successfully returned statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Statistics'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+components:
+  schemas:
+    Statistics:
+      type: object
+      required:
+        - num_vehicle_status_events
+        - num_incident_events
+        - max_distance_travelled
+        - max_incident_severity
+        - last_updated
+      properties:
+        num_vehicle_status_events:
+          type: integer
+          description: Total number of vehicle status events processed
+          example: 500
+        num_incident_events:
+          type: integer
+          description: Total number of incident reports processed
+          example: 300
+        max_distance_travelled:
+          type: number
+          description: Average distance travelled from vehicle status events
+          example: 120.5
+        max_incident_severity:
+          type: number
+          description: Average on-time score from vehicle status events
+          example: 4.8
+        last_updated:
+          type: string
+          format: date-time
+          description: The timestamp of when the statistics were last updated
+          example: "2024-02-15T12:34:56Z"

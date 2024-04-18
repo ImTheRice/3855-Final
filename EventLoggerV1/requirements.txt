@@ -1,0 +1,7 @@
+flask
+pykafka==2.8.0
+kafka-python
+connexion[flask,swagger-ui]
+pyyaml
+uvicorn
+uvicorn==0.26.0

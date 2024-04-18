@@ -1,0 +1,12 @@
+version: 1
+eventstore1:
+  url: http://localhost:8090/events/vehicle-status
+eventstore2:
+  url: http://localhost:8090/events/incident-report
+events:
+  hostname: acit3855group4kafka.eastus2.cloudapp.azure.com
+  port: 9092
+  topic: events
+kafka:
+  max_retries: 5
+  retry_delay: 5

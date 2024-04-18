@@ -1,0 +1,42 @@
+openapi: "3.0.0"
+info:
+  title: Event Logger API
+  description: API for accessing event statistics from the Event Logger service.
+  version: "1.0.0"
+
+servers:
+  - url: http://localhost:8120/
+
+paths:
+  /events_stats:
+    get:
+      summary: Retrieve event statistics
+      description: Returns the number of events logged for each event code.
+      operationId: "app.get_event_stats"
+      responses:
+        '200':
+          description: A map of event codes to their respective counts.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  description: The count of events for the event code.
+                  example: {
+                    "0001": 10,
+                    "0002": 22,
+                    "0003": 12,
+                    "0004": 98
+                  }
+        '500':
+          description: An error occurred during the process.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal Server Error"
+
