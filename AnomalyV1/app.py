@@ -98,8 +98,8 @@ def consume_messages():
 
                 elif msg["type"] == "IncidentEvent":
                     print(f"IncidentEvent{msg['payload']['incidentSeverity']}")
-                    if (msg['payload']['IncidentEvent']) > app_config['anomaly']['thress2']:
-                        logger.info(f"Anomaly detected: {msg['type'], msg['payload']['IncidentEvent'], app_config['anomaly']['thress2']}")
+                    if (msg['payload']['incidentSeverity']) > app_config['anomaly']['thress2']:
+                        logger.info(f"Anomaly detected: {msg['type'], msg['payload']['incidentSeverity'], app_config['anomaly']['thress2']}")
             else:
                 logger.info(f"Received non-event message: {msg}")
             consumer.commit_offsets()
