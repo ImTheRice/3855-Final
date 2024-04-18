@@ -6,7 +6,7 @@ const Lazy = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      fetch('http://acit3855group4kafka.eastus2.cloudapp.azure.com/event_log/events_stats')
+      fetch('http://acit3855group4kafka.eastus2.cloudapp.azure.com/event_logger/events_stats')
         .then((response) => response.json())
         .then((data) => {
           setData(data);
