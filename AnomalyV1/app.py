@@ -12,10 +12,10 @@ import logging
 import logging.config
 import os
 import connexion
-from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware import Middleware
+from flask_cors import CORS
+from connexion.middleware import MiddlewarePosition
 from starlette.middleware.cors import CORSMiddleware
-from starlette.middleware.base import MiddlewarePosition
+
 
 environment = os.getenv("TARGET_ENV", "development")
 
@@ -69,52 +69,52 @@ except Exception as e:
     logger.error(f"Failed to create database engine or sessionmaker: {e}")
 
 logger.info(f"Application started in {environment} environment.")  
+logger.info(f"Thresshold values: {app_config['anomaly']['thress1']}, {app_config['anomaly']['thress2']}")
+# @app.route('/anomalies', methods=['GET'])
+# def get_anomalies():
+#     # Get the anomaly type from query parameters
+#     anomaly_type = request.args.get('type')
 
-@app.route('/anomalies', methods=['GET'])
-def get_anomalies():
-    # Get the anomaly type from query parameters
-    anomaly_type = request.args.get('type')
+#     # Query the anomalies from the database
+#     session = sessionmaker(bind=engine)()
+#     anomalies = session.query(Anomaly).filter_by(anomaly_type=anomaly_type).order_by(Anomaly.date_created.desc()).all()
 
-    # Query the anomalies from the database
-    session = sessionmaker(bind=engine)()
-    anomalies = session.query(Anomaly).filter_by(anomaly_type=anomaly_type).order_by(Anomaly.date_created.desc()).all()
+#     # Convert anomalies to dictionary representation
+#     anomalies_dict = [anomaly.to_dict() for anomaly in anomalies]
 
-    # Convert anomalies to dictionary representation
-    anomalies_dict = [anomaly.to_dict() for anomaly in anomalies]
+#     return json.dumps(anomalies_dict)
 
-    return json.dumps(anomalies_dict)
+# @app.route('/events', methods=['POST'])
+# def consume_event():
+#     # Get the event data from the request
+#     event_data = request.get_json()
 
-@app.route('/events', methods=['POST'])
-def consume_event():
-    # Get the event data from the request
-    event_data = request.get_json()
+#     logger.debug("Entering get_incident_event function")
+#     try:
+#         hostname = f'{app_config["events"]["hostname"]}:{app_config["events"]["port"]}'
+#         client = KafkaClient(hosts=hostname)
+#         topic = client.topics[str.encode(app_config["events"]["topic"])]
+#         consumer = topic.get_simple_consumer(reset_offset_on_start=True, consumer_timeout_ms=1000)
+#         logger.debug("Kafka consumer initialized")
 
-    logger.debug("Entering get_incident_event function")
-    try:
-        hostname = f'{app_config["events"]["hostname"]}:{app_config["events"]["port"]}'
-        client = KafkaClient(hosts=hostname)
-        topic = client.topics[str.encode(app_config["events"]["topic"])]
-        consumer = topic.get_simple_consumer(reset_offset_on_start=True, consumer_timeout_ms=1000)
-        logger.debug("Kafka consumer initialized")
-
-        count = 0
-        for msg in consumer:
-            if msg is not None and msg.value:
-                msg_str = msg.value.decode('utf-8').strip()
-                if msg_str:  # Check if msg_str is not empty
-                    try:
-                        msg = json.loads(msg_str)
-                        if msg["type"] == "IncidentEvent":
-                            if count == index:
-                                logger.info(f"Incident Event found at index {index}")
-                                return msg["payload"], 200
-                            count += 1
-                    except json.JSONDecodeError as e:
-                        logger.error(f"JSON decoding error: {e} - Message string: '{msg_str}'")
-                        continue  # Skip this message and continue with the next
-    except Exception as e:
-        logger.error(f"Error retrieving Incident Event: {e}", exc_info=True)
-    logger.error(f"Could not find Incident Event at index {index}")
+#         count = 0
+#         for msg in consumer:
+#             if msg is not None and msg.value:
+#                 msg_str = msg.value.decode('utf-8').strip()
+#                 if msg_str:  # Check if msg_str is not empty
+#                     try:
+#                         msg = json.loads(msg_str)
+#                         if msg["type"] == "IncidentEvent":
+#                             if count == index:
+#                                 logger.info(f"Incident Event found at index {index}")
+#                                 return msg["payload"], 200
+#                             count += 1
+#                     except json.JSONDecodeError as e:
+#                         logger.error(f"JSON decoding error: {e} - Message string: '{msg_str}'")
+#                         continue  # Skip this message and continue with the next
+#     except Exception as e:
+#         logger.error(f"Error retrieving Incident Event: {e}", exc_info=True)
+#     logger.error(f"Could not find Incident Event at index {index}")
     
     # return {"message": "Not Found"}, 404
     # If an anomaly is detected, create an Anomaly object and save it to the database
@@ -128,7 +128,7 @@ def consume_event():
     #     db.session.add(anomaly)
     #     db.session.commit()
 
-    return 'Event consumed successfully'
+    # return 'Event consumed successfully'
 
 app = connexion.FlaskApp(__name__, specification_dir='./')
 
