@@ -95,11 +95,18 @@ def consume_messages():
                 if msg["type"] == "VehicleStatusEvent":
                     if (msg['payload']['distanceTravelled']) > app_config['anomaly']['thress1']:
                         logger.info(f"Anomaly detected: {msg['type'], msg['payload']['distanceTravelled'], app_config['anomaly']['thress1']}")
+                        session = sessionmaker(bind=engine)()
+                        anomaly = Anomaly(anomaly_type=msg['type'], value=msg['payload']['distanceTravelled'], date_created=datetime.datetime.now())
+                        session.add(anomaly)
+                        session.commit()
 
                 elif msg["type"] == "IncidentEvent":
-                    print(f"IncidentEvent{msg['payload']['incidentSeverity']}")
                     if (msg['payload']['incidentSeverity']) > app_config['anomaly']['thress2']:
                         logger.info(f"Anomaly detected: {msg['type'], msg['payload']['incidentSeverity'], app_config['anomaly']['thress2']}")
+                        session = sessionmaker(bind=engine)()
+                        anomaly = Anomaly(anomaly_type=msg['type'], value=msg['payload']['incidentSeverity'], date_created=datetime.datetime.now())
+                        session.add(anomaly)
+                        session.commit()
             else:
                 logger.info(f"Received non-event message: {msg}")
             consumer.commit_offsets()
