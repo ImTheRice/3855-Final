@@ -1,3 +1,4 @@
+from threading import Thread
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from pykafka import KafkaClient
@@ -136,4 +137,7 @@ def get_anomalies():
 
 
 if __name__ == '__main__':
+    t1 = Thread(target=consume_messages)
+    t1.setDaemon(True)
+    t1.start()
     app.run(host='0.0.0.0', port=8200)
