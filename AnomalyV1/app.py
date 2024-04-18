@@ -86,8 +86,7 @@ def consume_messages():
             msg_str = message.value.decode('utf-8')
             msg = json.loads(msg_str)
             
-            logger.info(f"Consumed message: {msg}")
-            logger.debug(f"Message received: {msg_str}")
+            # logger.debug(f"Message received: {msg_str}")
             
             payload = msg.get('payload', {})
             payload.pop('datetime', None)
@@ -95,6 +94,13 @@ def consume_messages():
             if "type" in msg:
                 if msg["type"] == "VehicleStatusEvent":
                     print(f"VehicleStatusEvent{msg['payload']['distanceTravelled']}")
+                    if (msg['payload']['distanceTravelled']) > app_config['anomaly']['thress1']:
+                        logger.info(f"Anomaly detected: {msg}")
+                        anomaly = Anomaly(anomaly_type="VehicleStatusEvent", payload=msg['payload'])
+                        session = sessionmaker(bind=engine)()
+                        session.add(anomaly)
+                        session.commit()
+                        session.close()
                 elif msg["type"] == "IncidentEvent":
                     print(f"IncidentEvent{msg['payload']['incidentSeverity']}")
             else:
