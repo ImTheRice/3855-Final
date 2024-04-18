@@ -149,13 +149,17 @@ app.add_api('openapi1.yaml', base_path="/anomaly", strict_validation=True, valid
 
 @app.route('/anomalies', methods=['GET'])
 def get_anomalies():
+    logger.info("Querying anomalies")
     # Get the anomaly type from query parameters
     anomaly_type = request.args.get('type')
 
     # Query the anomalies from the database
     session = sessionmaker(bind=engine)()
     anomalies = session.query(Anomaly).filter_by(anomaly_type=anomaly_type).order_by(Anomaly.date_created.desc()).all()
-
+    if anomalies is None:
+        return json.dumps([])
+    else:
+        logger.info("completed anomaly query")
     # Convert anomalies to dictionary representation
     anomalies_dict = [anomaly.to_dict() for anomaly in anomalies]
     logger.info(f"Returning anomalies: {anomalies_dict}")
