@@ -15,9 +15,10 @@ events:
   port: 9092
   topic: events
 kafka:
+  hosts: "acit3855group4kafka.eastus2.cloudapp.azure.com:9092"
+  topic: "events"
   max_retries: 5
   retry_interval: 10
-  event_log_topic: event_log
 anomaly:
   thress1: 50
   thress2: 8

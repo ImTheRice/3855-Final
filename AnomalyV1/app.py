@@ -16,6 +16,7 @@ from flask_cors import CORS
 from connexion.middleware import MiddlewarePosition
 from starlette.middleware.cors import CORSMiddleware
 from flask import Flask
+from pykafka.common import OffsetType
 
 
 environment = os.getenv("TARGET_ENV", "development")
@@ -61,36 +62,35 @@ except Exception as e:
     exit(1)
 
 # [V4] KAFKA
-logger.info(f"Connecting to MySQL database at {app_config['datastore']['hostname']}:{app_config['datastore']['port']}")
-try:
-    DB_ENGINE = create_engine(f"mysql+pymysql://{app_config['datastore']['user']}:{app_config['datastore']['password']}@{app_config['datastore']['hostname']}:{app_config['datastore']['port']}/{app_config['datastore']['db']}")
-    Session = sessionmaker(bind=DB_ENGINE)
-    logger.info("Database engine and sessionmaker successfully created.")
-except Exception as e:
-    logger.error(f"Failed to create database engine or sessionmaker: {e}")
+# logger.info(f"Connecting to MySQL database at {app_config['datastore']['hostname']}:{app_config['datastore']['port']}")
+# try:
+#     DB_ENGINE = create_engine(f"mysql+pymysql://{app_config['datastore']['user']}:{app_config['datastore']['password']}@{app_config['datastore']['hostname']}:{app_config['datastore']['port']}/{app_config['datastore']['db']}")
+#     Session = sessionmaker(bind=DB_ENGINE)
+#     logger.info("Database engine and sessionmaker successfully created.")
+# except Exception as e:
+#     logger.error(f"Failed to create database engine or sessionmaker: {e}")
 
-logger.info(f"Application started in {environment} environment.")  
-logger.info(f"Thresshold values: {app_config['anomaly']['thress1']}, {app_config['anomaly']['thress2']}")
+# logger.info(f"Application started in {environment} environment.")  
+# logger.info(f"Thresshold values: {app_config['anomaly']['thress1']}, {app_config['anomaly']['thress2']}")
 
+# Create Kafka Consumer
+def create_kafka_consumer():
+    client = KafkaClient(hosts=app_config['kafka']['hosts'])
+    topic = client.topics[app_config['kafka']['topic'].encode('utf-8')]
+    consumer = topic.get_simple_consumer(
+        auto_offset_reset=OffsetType.EARLIEST, 
+        reset_offset_on_start=True
+    )
+    return consumer
 
-# Create the Flask app object
-app = Flask(__name__)
+consumer = create_kafka_consumer()
 
+def consume_messages():
+    """Consumes messages from Kafka and logs them to sqlite."""
 
-@app.route('/anomalies', methods=['GET'])
-def get_anomalies():
-    # Get the anomaly type from query parameters
-    anomaly_type = request.args.get('type')
-
-    # Query the anomalies from the database
-    session = sessionmaker(bind=engine)()
-    anomalies = session.query(Anomaly).filter_by(anomaly_type=anomaly_type).order_by(Anomaly.date_created.desc()).all()
-
-    # Convert anomalies to dictionary representation
-    anomalies_dict = [anomaly.to_dict() for anomaly in anomalies]
-
-    return json.dumps(anomalies_dict)
-
+    for message in consumer:
+        if message is not None:
+            print(f"Consumed message: {message.value}")
 # @app.route('/events', methods=['POST'])
 # def consume_event():
 #     # Get the event data from the request
@@ -149,6 +149,21 @@ app.add_middleware(
 )
 
 app.add_api('openapi1.yaml', base_path="/anomaly", strict_validation=True, validate_responses=True)
+
+@app.route('/anomalies', methods=['GET'])
+def get_anomalies():
+    # Get the anomaly type from query parameters
+    anomaly_type = request.args.get('type')
+
+    # Query the anomalies from the database
+    session = sessionmaker(bind=engine)()
+    anomalies = session.query(Anomaly).filter_by(anomaly_type=anomaly_type).order_by(Anomaly.date_created.desc()).all()
+
+    # Convert anomalies to dictionary representation
+    anomalies_dict = [anomaly.to_dict() for anomaly in anomalies]
+
+    return json.dumps(anomalies_dict)
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8200)
