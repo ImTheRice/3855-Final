@@ -94,9 +94,9 @@ def consume_messages():
 
             if "type" in msg:
                 if msg["type"] == "VehicleStatusEvent":
-                    print(f"VehicleStatusEvent{msg['payload']}")
+                    print(f"VehicleStatusEvent{msg['payload']['distanceTravelled']}")
                 elif msg["type"] == "IncidentEvent":
-                    print(f"IncidentEvent{msg['payload']}")
+                    print(f"IncidentEvent{msg['payload']['incidentSeverity']}")
             else:
                 logger.info(f"Received non-event message: {msg}")
             consumer.commit_offsets()
