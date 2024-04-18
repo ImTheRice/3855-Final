@@ -141,7 +141,7 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-app.add_api('Transit.yaml', base_path="/anomaly", strict_validation=True, validate_responses=True)
+app.add_api('openapi1.yaml', base_path="/anomaly", strict_validation=True, validate_responses=True)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8200)
