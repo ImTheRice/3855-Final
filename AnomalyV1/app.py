@@ -95,7 +95,7 @@ def consume_messages():
                 if msg["type"] == "VehicleStatusEvent":
                     print(f"VehicleStatusEvent{msg['payload']['distanceTravelled']}")
                     if (msg['payload']['distanceTravelled']) > app_config['anomaly']['thress1']:
-                        logger.info(f"Anomaly detected: {msg}")
+                        logger.info(f"Anomaly detected: {msg['type'], msg['distanceTravelled'], app_config['anomaly']['thress1']}")
                         # anomaly = Anomaly(anomaly_type="VehicleStatusEvent", payload=msg['payload'])
                         # session = sessionmaker(bind=engine)()
                         # session.add(anomaly)
