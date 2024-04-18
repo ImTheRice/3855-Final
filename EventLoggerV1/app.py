@@ -103,6 +103,7 @@ app.add_api('transit.yaml', base_path="/event_logger", strict_validation=True, v
 if __name__ == "__main__":
     # Start the Kafka consumer thread
     thread = Thread(target=consume_messages)
+    thread.setDaemon(True)
     thread.start()
     # Start the Flask app
     app.run(host='0.0.0.0', port=8120, debug=True)
