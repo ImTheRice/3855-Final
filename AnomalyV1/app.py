@@ -80,6 +80,34 @@ except Exception as e:
 logger.info(f"Application started in {environment} environment.")  
 logger.info(f"Thresshold values: {app_config['anomaly']['thress1']}, {app_config['anomaly']['thress2']}")
 
+app = connexion.FlaskApp(__name__, specification_dir='./')
+app.add_api('openapi1.yaml', base_path="/anomaly", strict_validation=True, validate_responses=True)
+# app.add_middleware(
+#     CORSMiddleware,
+#     position=MiddlewarePosition.BEFORE_EXCEPTION,
+#     allow_origins=["*"],  # Allows all origins
+#     allow_credentials=True,
+#     allow_methods=["*"],  # Allows all methods
+#     allow_headers=["*"],  # Allows all headers
+# )
+@app.route('/anomalies', methods=['GET'])
+def get_anomalies():
+    logger.info("Querying anomalies")
+    # Get the anomaly type from query parameters
+    anomaly_type = request.args.get('type')
+
+    # Query the anomalies from the database
+    session = sessionmaker(bind=engine)()
+    anomalies = session.query(Anomaly).filter_by(anomaly_type=anomaly_type).order_by(Anomaly.date_created.desc()).all()
+    if anomalies is None:
+        return json.dumps([])
+    else:
+        logger.info("completed anomaly query")
+    # Convert anomalies to dictionary representation
+    anomalies_dict = [anomaly.to_dict() for anomaly in anomalies]
+    logger.info(f"Returning anomalies: {anomalies_dict}")
+    return json.dumps(anomalies_dict)
+
 # Create Kafka Consumer
 def create_kafka_consumer():
     client = KafkaClient(hosts=app_config['kafka']['hosts'])
@@ -134,39 +162,8 @@ def consume_messages():
                 logger.info(f"Received non-event message: {msg}")
             consumer.commit_offsets()
 
-app = connexion.FlaskApp(__name__, specification_dir='./')
-
-app.add_middleware(
-    CORSMiddleware,
-    position=MiddlewarePosition.BEFORE_EXCEPTION,
-    allow_origins=["*"],  # Allows all origins
-    allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods
-    allow_headers=["*"],  # Allows all headers
-)
-
-app.add_api('openapi1.yaml', base_path="/anomaly", strict_validation=True, validate_responses=True)
-
-@app.route('/anomalies', methods=['GET'])
-def get_anomalies():
-    logger.info("Querying anomalies")
-    # Get the anomaly type from query parameters
-    anomaly_type = request.args.get('type')
-
-    # Query the anomalies from the database
-    session = sessionmaker(bind=engine)()
-    anomalies = session.query(Anomaly).filter_by(anomaly_type=anomaly_type).order_by(Anomaly.date_created.desc()).all()
-    if anomalies is None:
-        return json.dumps([])
-    else:
-        logger.info("completed anomaly query")
-    # Convert anomalies to dictionary representation
-    anomalies_dict = [anomaly.to_dict() for anomaly in anomalies]
-    logger.info(f"Returning anomalies: {anomalies_dict}")
-    return json.dumps(anomalies_dict)
-
 if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8180)
     t1 = Thread(target=consume_messages)
     t1.setDaemon(True)
     t1.start()
-    app.run(host='0.0.0.0', port=8180)
