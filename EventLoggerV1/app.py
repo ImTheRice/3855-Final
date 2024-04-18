@@ -80,7 +80,7 @@ def consume_messages():
                 logger.error(f"Unexpected error: {e}")
 
 @app.route("/events_stats", methods=["GET"])
-def fetch_event_stats():
+def get_event_stats():
     """Fetches and returns event counts by code from a JSON file."""
     try:
         with open(json_db_path, 'r') as file:
