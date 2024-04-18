@@ -93,21 +93,16 @@ def consume_messages():
 
             if "type" in msg:
                 if msg["type"] == "VehicleStatusEvent":
-                    print(f"VehicleStatusEvent{msg['payload']['distanceTravelled']}")
                     if (msg['payload']['distanceTravelled']) > app_config['anomaly']['thress1']:
                         logger.info(f"Anomaly detected: {msg['type'], msg['payload']['distanceTravelled'], app_config['anomaly']['thress1']}")
-                        # anomaly = Anomaly(anomaly_type="VehicleStatusEvent", payload=msg['payload'])
-                        # session = sessionmaker(bind=engine)()
-                        # session.add(anomaly)
-                        # session.commit()
-                        # session.close()
+
                 elif msg["type"] == "IncidentEvent":
                     print(f"IncidentEvent{msg['payload']['incidentSeverity']}")
+                    if (msg['payload']['IncidentEvent']) > app_config['anomaly']['thress2']:
+                        logger.info(f"Anomaly detected: {msg['type'], msg['payload']['IncidentEvent'], app_config['anomaly']['thress2']}")
             else:
                 logger.info(f"Received non-event message: {msg}")
             consumer.commit_offsets()
-# @app.route('/events', methods=['POST'])
-
 
 app = connexion.FlaskApp(__name__, specification_dir='./')
 
