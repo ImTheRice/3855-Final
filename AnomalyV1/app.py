@@ -96,11 +96,11 @@ def consume_messages():
                     print(f"VehicleStatusEvent{msg['payload']['distanceTravelled']}")
                     if (msg['payload']['distanceTravelled']) > app_config['anomaly']['thress1']:
                         logger.info(f"Anomaly detected: {msg}")
-                        anomaly = Anomaly(anomaly_type="VehicleStatusEvent", payload=msg['payload'])
-                        session = sessionmaker(bind=engine)()
-                        session.add(anomaly)
-                        session.commit()
-                        session.close()
+                        # anomaly = Anomaly(anomaly_type="VehicleStatusEvent", payload=msg['payload'])
+                        # session = sessionmaker(bind=engine)()
+                        # session.add(anomaly)
+                        # session.commit()
+                        # session.close()
                 elif msg["type"] == "IncidentEvent":
                     print(f"IncidentEvent{msg['payload']['incidentSeverity']}")
             else:
