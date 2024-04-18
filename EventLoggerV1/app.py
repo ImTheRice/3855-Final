@@ -96,8 +96,8 @@ def fetch_event_stats():
         logger.error(f"Internal Server Error: {e}")
         return jsonify({"error": "Internal Server Error"}), 500
 
-# app = connexion.FlaskApp(__name__, specification_dir='./')
-# app.add_api('transit.yaml', base_path="/event_logger", strict_validation=True, validate_responses=True)
+app = connexion.FlaskApp(__name__, specification_dir='./')
+app.add_api('transit.yaml', base_path="/event_logger", strict_validation=True, validate_responses=True)
 
 
 if __name__ == "__main__":
