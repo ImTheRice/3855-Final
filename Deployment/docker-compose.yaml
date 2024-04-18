@@ -180,7 +180,7 @@ services:
   anomoaly_v1:
     build: ../AnomalyV1
     ports:
-      - "8100"
+      - "8180"
     environment:
       - TARGET_ENV=test
     volumes:
