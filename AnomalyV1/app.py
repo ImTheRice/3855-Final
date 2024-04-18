@@ -42,12 +42,10 @@ try:
 except Exception as e:
     print(f"Error loading logging configuration: {e}")
     exit(1)
-
 logger = logging.getLogger('basicLogger')
 
 # Create the anomaly table if it doesn't exist
 engine = create_engine('sqlite:///anomaly.sqlite')
-# Base.metadata.create_all(engine)
 
 try:
     database_uri = f"sqlite:////{app_config['datastore']['filename']}"
@@ -61,6 +59,8 @@ except Exception as e:
     logger.error(f"Database connection failed: {e}")
     exit(1)
 
+logger.info(f"Application started in {environment} environment.")  
+logger.info(f"Thresshold values: {app_config['anomaly']['thress1']}, {app_config['anomaly']['thress2']}")
 # [V4] KAFKA
 # logger.info(f"Connecting to MySQL database at {app_config['datastore']['hostname']}:{app_config['datastore']['port']}")
 # try:
@@ -69,9 +69,6 @@ except Exception as e:
 #     logger.info("Database engine and sessionmaker successfully created.")
 # except Exception as e:
 #     logger.error(f"Failed to create database engine or sessionmaker: {e}")
-
-# logger.info(f"Application started in {environment} environment.")  
-# logger.info(f"Thresshold values: {app_config['anomaly']['thress1']}, {app_config['anomaly']['thress2']}")
 
 # Create Kafka Consumer
 def create_kafka_consumer():
@@ -91,6 +88,9 @@ def consume_messages():
     for message in consumer:
         if message is not None:
             print(f"Consumed message: {message.value}")
+
+
+
 # @app.route('/events', methods=['POST'])
 # def consume_event():
 #     # Get the event data from the request
