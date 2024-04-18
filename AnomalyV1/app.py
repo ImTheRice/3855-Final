@@ -75,13 +75,8 @@ logger.info(f"Thresshold values: {app_config['anomaly']['thress1']}, {app_config
 def create_kafka_consumer():
     client = KafkaClient(hosts=app_config['kafka']['hosts'])
     topic = client.topics[app_config['kafka']['topic'].encode('utf-8')]
-    consumer = topic.get_simple_consumer(
-        auto_offset_reset=OffsetType.EARLIEST, 
-        reset_offset_on_start=True
-    )
+    consumer = topic.get_simple_consumer(consumer_group=b'event_group', reset_offset_on_start=False, auto_offset_reset=OffsetType.LATEST)
     return consumer
-
-
 
 def consume_messages():
     """Consumes messages from Kafka and logs them to sqlite."""
