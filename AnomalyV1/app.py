@@ -1,3 +1,4 @@
+import sqlite3
 from threading import Thread
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
@@ -62,14 +63,6 @@ except Exception as e:
 
 logger.info(f"Application started in {environment} environment.")  
 logger.info(f"Thresshold values: {app_config['anomaly']['thress1']}, {app_config['anomaly']['thress2']}")
-# [V4] KAFKA
-# logger.info(f"Connecting to MySQL database at {app_config['datastore']['hostname']}:{app_config['datastore']['port']}")
-# try:
-#     DB_ENGINE = create_engine(f"mysql+pymysql://{app_config['datastore']['user']}:{app_config['datastore']['password']}@{app_config['datastore']['hostname']}:{app_config['datastore']['port']}/{app_config['datastore']['db']}")
-#     Session = sessionmaker(bind=DB_ENGINE)
-#     logger.info("Database engine and sessionmaker successfully created.")
-# except Exception as e:
-#     logger.error(f"Failed to create database engine or sessionmaker: {e}")
 
 # Create Kafka Consumer
 def create_kafka_consumer():
@@ -80,6 +73,8 @@ def create_kafka_consumer():
 
 def consume_messages():
     """Consumes messages from Kafka and logs them to sqlite."""
+    conn = sqlite3.connect('sensor_data.db')
+    cursor = conn.cursor()
     consumer = create_kafka_consumer()
     for message in consumer:
         if message is not None:
@@ -96,7 +91,7 @@ def consume_messages():
                     if (msg['payload']['distanceTravelled']) > app_config['anomaly']['thress1']:
                         logger.info(f"Anomaly detected: {msg['type'], msg['payload']['distanceTravelled'], app_config['anomaly']['thress1']}")
                         session = sessionmaker(bind=engine)()
-                        anomaly = Anomaly(anomaly_type=msg['type'], value=msg['payload']['distanceTravelled'], date_created=datetime.datetime.now())
+                        anomaly = Anomaly(anomaly_type=msg['type'], description=msg['payload']['distanceTravelled'], date_created=datetime.datetime.now())
                         session.add(anomaly)
                         session.commit()
 
@@ -104,7 +99,7 @@ def consume_messages():
                     if (msg['payload']['incidentSeverity']) > app_config['anomaly']['thress2']:
                         logger.info(f"Anomaly detected: {msg['type'], msg['payload']['incidentSeverity'], app_config['anomaly']['thress2']}")
                         session = sessionmaker(bind=engine)()
-                        anomaly = Anomaly(anomaly_type=msg['type'], value=msg['payload']['incidentSeverity'], date_created=datetime.datetime.now())
+                        anomaly = Anomaly(anomaly_type=msg['type'],  description=msg['payload']['incidentSeverity'], date_created=datetime.datetime.now())
                         session.add(anomaly)
                         session.commit()
             else:
