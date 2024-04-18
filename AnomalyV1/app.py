@@ -152,4 +152,4 @@ if __name__ == '__main__':
     t1 = Thread(target=consume_messages)
     t1.setDaemon(True)
     t1.start()
-    app.run(host='0.0.0.0', port=8200)
+    app.run(host='0.0.0.0', port=8180)
