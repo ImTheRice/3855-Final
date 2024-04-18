@@ -95,9 +95,9 @@ def consume_messages():
                         logger.info(f"Anomaly detected: {msg['type'], msg['payload']['distanceTravelled'], app_config['anomaly']['thress1']}")
                         session = sessionmaker(bind=engine)()
                         anomaly = Anomaly(
-                            event_id=msg['event_id'], 
-                            trace_id=msg['trace_id'], 
-                            event_type=msg['event_type'], 
+                            event_id=msg['payload']['userId'], 
+                            trace_id=msg['payload']['trace_id'], 
+                            event_type=msg['type'], 
                             anomaly_type=msg['type'], 
                             description=msg['payload']['distanceTravelled']
                         )
@@ -109,9 +109,9 @@ def consume_messages():
                         logger.info(f"Anomaly detected: {msg['type'], msg['payload']['incidentSeverity'], app_config['anomaly']['thress2']}")
                         session = sessionmaker(bind=engine)()
                         anomaly = Anomaly(
-                            event_id=msg['event_id'], 
-                            trace_id=msg['trace_id'], 
-                            event_type=msg['event_type'], 
+                            event_id=msg['payload']['userId'], 
+                            trace_id=msg['payload']['trace_id'], 
+                            event_type=msg['type'], 
                             anomaly_type=msg['type'], 
                             description=msg['payload']['incidentSeverity']
                         )
