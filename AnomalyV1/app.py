@@ -94,7 +94,13 @@ def consume_messages():
                     if (msg['payload']['distanceTravelled']) > app_config['anomaly']['thress1']:
                         logger.info(f"Anomaly detected: {msg['type'], msg['payload']['distanceTravelled'], app_config['anomaly']['thress1']}")
                         session = sessionmaker(bind=engine)()
-                        anomaly = Anomaly(anomaly_type=msg['type'], description=msg['payload']['distanceTravelled'], date_created=datetime.datetime.now())
+                        anomaly = Anomaly(
+                            event_id=msg['event_id'], 
+                            trace_id=msg['trace_id'], 
+                            event_type=msg['event_type'], 
+                            anomaly_type=msg['type'], 
+                            description=msg['payload']['distanceTravelled']
+                        )
                         session.add(anomaly)
                         session.commit()
 
@@ -102,7 +108,13 @@ def consume_messages():
                     if (msg['payload']['incidentSeverity']) > app_config['anomaly']['thress2']:
                         logger.info(f"Anomaly detected: {msg['type'], msg['payload']['incidentSeverity'], app_config['anomaly']['thress2']}")
                         session = sessionmaker(bind=engine)()
-                        anomaly = Anomaly(anomaly_type=msg['type'],  description=msg['payload']['incidentSeverity'], date_created=datetime.datetime.now())
+                        anomaly = Anomaly(
+                            event_id=msg['event_id'], 
+                            trace_id=msg['trace_id'], 
+                            event_type=msg['event_type'], 
+                            anomaly_type=msg['type'], 
+                            description=msg['payload']['incidentSeverity']
+                        )
                         session.add(anomaly)
                         session.commit()
             else:
