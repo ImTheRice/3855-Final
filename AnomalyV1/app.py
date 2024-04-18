@@ -15,6 +15,7 @@ import connexion
 from flask_cors import CORS
 from connexion.middleware import MiddlewarePosition
 from starlette.middleware.cors import CORSMiddleware
+from flask import Flask
 
 
 environment = os.getenv("TARGET_ENV", "development")
@@ -70,19 +71,25 @@ except Exception as e:
 
 logger.info(f"Application started in {environment} environment.")  
 logger.info(f"Thresshold values: {app_config['anomaly']['thress1']}, {app_config['anomaly']['thress2']}")
-# @app.route('/anomalies', methods=['GET'])
-# def get_anomalies():
-#     # Get the anomaly type from query parameters
-#     anomaly_type = request.args.get('type')
 
-#     # Query the anomalies from the database
-#     session = sessionmaker(bind=engine)()
-#     anomalies = session.query(Anomaly).filter_by(anomaly_type=anomaly_type).order_by(Anomaly.date_created.desc()).all()
 
-#     # Convert anomalies to dictionary representation
-#     anomalies_dict = [anomaly.to_dict() for anomaly in anomalies]
+# Create the Flask app object
+app = Flask(__name__)
 
-#     return json.dumps(anomalies_dict)
+
+@app.route('/anomalies', methods=['GET'])
+def get_anomalies():
+    # Get the anomaly type from query parameters
+    anomaly_type = request.args.get('type')
+
+    # Query the anomalies from the database
+    session = sessionmaker(bind=engine)()
+    anomalies = session.query(Anomaly).filter_by(anomaly_type=anomaly_type).order_by(Anomaly.date_created.desc()).all()
+
+    # Convert anomalies to dictionary representation
+    anomalies_dict = [anomaly.to_dict() for anomaly in anomalies]
+
+    return json.dumps(anomalies_dict)
 
 # @app.route('/events', methods=['POST'])
 # def consume_event():
