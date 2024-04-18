@@ -148,7 +148,6 @@ def get_anomalies():
 
     return json.dumps(anomalies_dict)
 
-
 if __name__ == '__main__':
     t1 = Thread(target=consume_messages)
     t1.setDaemon(True)
