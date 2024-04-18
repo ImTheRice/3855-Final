@@ -80,62 +80,32 @@ def create_kafka_consumer():
     )
     return consumer
 
-consumer = create_kafka_consumer()
+
 
 def consume_messages():
     """Consumes messages from Kafka and logs them to sqlite."""
-
+    consumer = create_kafka_consumer()
     for message in consumer:
         if message is not None:
-            print(f"Consumed message: {message.value}")
+            msg_str = message.value.decode('utf-8')
+            msg = json.loads(msg_str)
+            
+            logger.info(f"Consumed message: {msg}")
+            logger.debug(f"Message received: {msg_str}")
+            
+            payload = msg.get('payload', {})
+            payload.pop('datetime', None)
 
-
-
+            if "type" in msg:
+                if msg["type"] == "VehicleStatusEvent":
+                    print(f"VehicleStatusEvent{msg['payload']}")
+                elif msg["type"] == "IncidentEvent":
+                    print(f"IncidentEvent{msg['payload']}")
+            else:
+                logger.info(f"Received non-event message: {msg}")
+            consumer.commit_offsets()
 # @app.route('/events', methods=['POST'])
-# def consume_event():
-#     # Get the event data from the request
-#     event_data = request.get_json()
 
-#     logger.debug("Entering get_incident_event function")
-#     try:
-#         hostname = f'{app_config["events"]["hostname"]}:{app_config["events"]["port"]}'
-#         client = KafkaClient(hosts=hostname)
-#         topic = client.topics[str.encode(app_config["events"]["topic"])]
-#         consumer = topic.get_simple_consumer(reset_offset_on_start=True, consumer_timeout_ms=1000)
-#         logger.debug("Kafka consumer initialized")
-
-#         count = 0
-#         for msg in consumer:
-#             if msg is not None and msg.value:
-#                 msg_str = msg.value.decode('utf-8').strip()
-#                 if msg_str:  # Check if msg_str is not empty
-#                     try:
-#                         msg = json.loads(msg_str)
-#                         if msg["type"] == "IncidentEvent":
-#                             if count == index:
-#                                 logger.info(f"Incident Event found at index {index}")
-#                                 return msg["payload"], 200
-#                             count += 1
-#                     except json.JSONDecodeError as e:
-#                         logger.error(f"JSON decoding error: {e} - Message string: '{msg_str}'")
-#                         continue  # Skip this message and continue with the next
-#     except Exception as e:
-#         logger.error(f"Error retrieving Incident Event: {e}", exc_info=True)
-#     logger.error(f"Could not find Incident Event at index {index}")
-    
-    # return {"message": "Not Found"}, 404
-    # If an anomaly is detected, create an Anomaly object and save it to the database
-    # if is_anomaly:
-    #     anomaly = Anomaly(event_id=event_data['event_id'],
-    #                       trace_id=event_data['trace_id'],
-    #                       event_type=event_data['event_type'],
-    #                       anomaly_type='high' if is_high_anomaly else 'low',
-    #                       description='Anomaly description',
-    #                       date_created=datetime.datetime.now())
-    #     db.session.add(anomaly)
-    #     db.session.commit()
-
-    # return 'Event consumed successfully'
 
 app = connexion.FlaskApp(__name__, specification_dir='./')
 
