@@ -1,0 +1,20 @@
+version: 1
+datastore:
+  filename: /data/anomaly.sqlite # ONLY CHANGE THIS LINE
+  hostname: acit3855group4kafka.eastus2.cloudapp.azure.com
+  port: 3306
+  user: superbaddefault
+  password: superbaddefault
+  db: events
+scheduler:
+  period_sec: 5
+eventstore:
+  url: http://acit3855group4kafka.eastus2.cloudapp.azure.com/storage
+events:
+  hostname: acit3855group4kafka.eastus2.cloudapp.azure.com
+  port: 9092
+  topic: events
+kafka:
+  max_retries: 5
+  retry_interval: 10
+  event_log_topic: event_log

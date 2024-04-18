@@ -1,0 +1,66 @@
+openapi: 3.0.0
+info:
+  description: This API provides event anomalies
+  version: "1.0.0"
+  title: Anomaly API
+  contact:
+    email: student@bcit.ca
+
+paths:
+  /anomaly_stats:
+    get:
+      summary: Gets the anomaly statistics
+      operationId: app.get_anomaly_stats
+      description: Gets the anomaly statistics
+      parameters:
+        - name: anomaly_type
+          in: query
+          description: The type of anomaly to retrieve
+          schema:
+            type: string
+            example: TooHigh
+      responses:
+        '200':
+          description: Successfully returned the anomaly statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnomalyStats'
+        '400':
+          description: Invalid Anomaly Type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Anomalies do not exist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+components:
+  schemas:
+    AnomalyStats:
+      required:
+      - num_anomalies
+      - most_recent_desc
+      - most_recent_datetime
+      properties:
+        num_anomalies:
+          type: integer
+          example: 5
+        most_recent_desc:
+          type: string
+          example: Value of 100 is too high
+        most_recent_datetime:
+          type: string
+          example: 2024-04-18 11:22:33
+      type: object
+

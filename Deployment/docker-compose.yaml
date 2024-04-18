@@ -160,7 +160,6 @@ services:
         - api.network
       restart: always
 
-
   event_logger_v1:
     build: ../EventLoggerV1 
     ports:
@@ -177,6 +176,29 @@ services:
     networks:
       - api.network 
     restart: "always" 
+
+  anomoaly_v1:
+    build: ../AnomoalyV1
+    ports:
+      - "8100"
+    environment:
+      - TARGET_ENV=test
+    volumes:
+      - /home/azureuser/config/anomoaly:/config
+      - /home/azureuser/logs:/logs
+      - /home/azureuser/anomoaly/data:/data 
+    depends_on:
+      kafka:
+        condition: service_healthy
+      processing_v2:
+        condition: service_started
+      audit_v1:
+        condition: service_started
+      storage_v4:
+        condition: service_started
+    networks:
+      - api.network  
+    restart: "always"
 
 networks:
   api.network:
