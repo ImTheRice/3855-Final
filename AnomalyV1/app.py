@@ -35,7 +35,7 @@ import connexion
 from connexion.middleware import MiddlewarePosition
 from starlette.middleware.cors import CORSMiddleware
 from pykafka.common import OffsetType
-
+from flask import jsonify, abort
 
 environment = os.getenv("TARGET_ENV", "development")
 
@@ -93,20 +93,25 @@ app.add_api('openapi1.yaml', base_path="/anomaly", strict_validation=True, valid
 @app.route('/anomalies', methods=['GET'])
 def get_anomalies():
     logger.info("Querying anomalies")
-    # Get the anomaly type from query parameters
     anomaly_type = request.args.get('type')
 
-    # Query the anomalies from the database
+    # Ensure the anomaly_type is provided and not empty
+    if not anomaly_type:
+        logger.error("No anomaly type provided")
+        abort(400, description="Missing 'type' query parameter")
+
     session = sessionmaker(bind=engine)()
     anomalies = session.query(Anomaly).filter_by(anomaly_type=anomaly_type).order_by(Anomaly.date_created.desc()).all()
-    if anomalies is None:
-        return json.dumps([])
-    else:
-        logger.info("completed anomaly query")
-    # Convert anomalies to dictionary representation
+
+    # Check if the query returned no results
+    if not anomalies:
+        logger.info("No anomalies found for the specified type")
+        return jsonify([])
+
     anomalies_dict = [anomaly.to_dict() for anomaly in anomalies]
-    logger.info(f"Returning anomalies: {anomalies_dict}")
-    return json.dumps(anomalies_dict)
+    logger.info(f"Returning {len(anomalies_dict)} anomalies")
+    return jsonify(anomalies_dict)
+
 
 # Create Kafka Consumer
 def create_kafka_consumer():
