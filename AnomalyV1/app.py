@@ -99,14 +99,15 @@ def get_anomalies():
     if not anomaly_type:
         logger.error("No anomaly type provided")
         abort(400, description="Missing 'type' query parameter")
-
+    logger.info(anomaly_type)
     session = sessionmaker(bind=engine)()
     anomalies = session.query(Anomaly).filter_by(anomaly_type=anomaly_type).order_by(Anomaly.date_created.desc()).all()
 
     # Check if the query returned no results
     if not anomalies:
         logger.info("No anomalies found for the specified type")
-        return jsonify([])
+        # return jsonify([])
+        pass
 
     anomalies_dict = [anomaly.to_dict() for anomaly in anomalies]
     logger.info(f"Returning {len(anomalies_dict)} anomalies")
