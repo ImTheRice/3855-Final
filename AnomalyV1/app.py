@@ -96,12 +96,12 @@ def get_anomalies():
     anomaly_type = request.args.get('type')
 
     # Ensure the anomaly_type is provided and not empty
-    if not anomaly_type:
-        logger.error("No anomaly type provided")
-        abort(400, description="Missing 'type' query parameter")
+    # if not anomaly_type:
+    #     logger.error("No anomaly type provided")
+    #     abort(400, description="Missing 'type' query parameter")
     logger.info(anomaly_type)
     session = sessionmaker(bind=engine)()
-    anomalies = session.query(Anomaly).filter_by(anomaly_type=anomaly_type).order_by(Anomaly.date_created.desc()).all()
+    anomalies = session.query(Anomaly).filter_by('IncidentEvent').order_by(Anomaly.date_created.desc()).all()
 
     # Check if the query returned no results
     if not anomalies:
